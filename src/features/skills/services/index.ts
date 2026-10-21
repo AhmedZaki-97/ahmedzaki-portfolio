@@ -2,21 +2,26 @@ import { createClient } from '@/lib/supabase/server';
 import type { Skill } from '@/types';
 
 export async function getVisibleSkills(): Promise<Skill[]> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('skills')
-    .select('*')
-    .eq('is_visible', true)
-    .order('category', { ascending: true })
-    .order('display_order', { ascending: true });
+    const { data, error } = await supabase
+      .from('skills')
+      .select('*')
+      .eq('is_visible', true)
+      .order('category', { ascending: true })
+      .order('display_order', { ascending: true });
 
-  if (error) {
-    console.error('Error fetching skills:', error);
+    if (error) {
+      console.error('Error fetching skills:', error);
+      return [];
+    }
+
+    return (data as Skill[]) || [];
+  } catch (error) {
+    console.warn('Skills fetch skipped (Supabase client not initialized):', error);
     return [];
   }
-
-  return (data as Skill[]) || [];
 }
 
 export async function getAllSkills(): Promise<Skill[]> {

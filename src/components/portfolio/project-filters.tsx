@@ -6,15 +6,25 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCallback, useState, useTransition } from 'react';
+import { useI18n } from '@/lib/i18n/context';
 
 interface ProjectFiltersProps {
   categories: string[];
 }
 
+const categoryTranslations: Record<string, string> = {
+  'Frontend': 'واجهات أمامية',
+  'Full Stack': 'تطبيقات متكاملة',
+  'Mobile': 'تطبيقات هاتف',
+  'UI/UX': 'تصميم واجهات',
+  'Other': 'أخرى',
+};
+
 export function ProjectFilters({ categories }: ProjectFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const { t, locale, isRtl } = useI18n();
 
   const currentSearch = searchParams.get('search') || '';
   const currentCategory = searchParams.get('category') || 'All';
@@ -43,11 +53,11 @@ export function ProjectFilters({ categories }: ProjectFiltersProps) {
     <div className="space-y-4">
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className={`absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
         <Input
           type="search"
-          placeholder="Search projects..."
-          className="pl-10"
+          placeholder={t.projects.searchPlaceholder}
+          className={isRtl ? 'pr-10 pl-3' : 'pl-10 pr-3'}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -59,26 +69,35 @@ export function ProjectFilters({ categories }: ProjectFiltersProps) {
       {/* Category filters */}
       {categories.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {allCategories.map((category) => (
-            <button
-              key={category}
-              onClick={() => updateFilters({ category })}
-              className="focus-ring rounded-full"
-            >
-              <Badge
-                variant={currentCategory === category ? 'default' : 'outline'}
-                className={cn(
-                  'cursor-pointer transition-colors px-3 py-1',
-                  currentCategory === category
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-accent',
-                  isPending && 'opacity-70'
-                )}
+          {allCategories.map((category) => {
+            const displayLabel =
+              category === 'All'
+                ? t.projects.allCategories
+                : locale === 'ar'
+                ? categoryTranslations[category] || category
+                : category;
+
+            return (
+              <button
+                key={category}
+                onClick={() => updateFilters({ category })}
+                className="focus-ring rounded-full"
               >
-                {category}
-              </Badge>
-            </button>
-          ))}
+                <Badge
+                  variant={currentCategory === category ? 'default' : 'outline'}
+                  className={cn(
+                    'cursor-pointer transition-colors px-3 py-1',
+                    currentCategory === category
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-accent',
+                    isPending && 'opacity-70'
+                  )}
+                >
+                  {displayLabel}
+                </Badge>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

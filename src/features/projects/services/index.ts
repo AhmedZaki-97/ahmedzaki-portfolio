@@ -12,54 +12,64 @@ export async function getPublishedProjects({
   limit?: number;
   offset?: number;
 } = {}): Promise<{ projects: Project[]; count: number }> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  let query = supabase
-    .from('projects')
-    .select('*', { count: 'exact' })
-    .eq('status', 'published')
-    .order('display_order', { ascending: true })
-    .order('created_at', { ascending: false });
+    let query = supabase
+      .from('projects')
+      .select('*', { count: 'exact' })
+      .eq('status', 'published')
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false });
 
-  if (search) {
-    query = query.or(`title.ilike.%${search}%,short_description.ilike.%${search}%`);
-  }
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,short_description.ilike.%${search}%`);
+    }
 
-  if (category && category !== 'All') {
-    query = query.eq('category', category);
-  }
+    if (category && category !== 'All') {
+      query = query.eq('category', category);
+    }
 
-  if (limit) {
-    query = query.range(offset, offset + limit - 1);
-  }
+    if (limit) {
+      query = query.range(offset, offset + limit - 1);
+    }
 
-  const { data, error, count } = await query;
+    const { data, error, count } = await query;
 
-  if (error) {
-    console.error('Error fetching published projects:', error);
+    if (error) {
+      console.error('Error fetching published projects:', error);
+      return { projects: [], count: 0 };
+    }
+
+    return { projects: (data as Project[]) || [], count: count || 0 };
+  } catch (error) {
+    console.warn('Projects fetch skipped (Supabase client not initialized):', error);
     return { projects: [], count: 0 };
   }
-
-  return { projects: (data as Project[]) || [], count: count || 0 };
 }
 
 export async function getFeaturedProjects(): Promise<Project[]> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('status', 'published')
-    .eq('is_featured', true)
-    .order('display_order', { ascending: true })
-    .limit(6);
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('status', 'published')
+      .eq('is_featured', true)
+      .order('display_order', { ascending: true })
+      .limit(6);
 
-  if (error) {
-    console.error('Error fetching featured projects:', error);
+    if (error) {
+      console.error('Error fetching featured projects:', error);
+      return [];
+    }
+
+    return (data as Project[]) || [];
+  } catch (error) {
+    console.warn('Featured projects fetch skipped (Supabase client not initialized):', error);
     return [];
   }
-
-  return (data as Project[]) || [];
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {

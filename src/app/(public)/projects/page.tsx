@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { ProjectCard } from '@/components/portfolio/project-card';
 import { ProjectFilters } from '@/components/portfolio/project-filters';
+import { ProjectsHeader } from '@/components/portfolio/projects-header';
 import { getPublishedProjects, getProjectCategories } from '@/features/projects/services';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FolderOpen } from 'lucide-react';
@@ -63,7 +64,11 @@ async function ProjectsContent({
   );
 }
 
-export default async function ProjectsPage(props: PageProps<"/projects">) {
+interface ProjectsPageProps {
+  searchParams: Promise<{ search?: string; category?: string }>;
+}
+
+export default async function ProjectsPage(props: ProjectsPageProps) {
   const searchParams = await props.searchParams;
   const search = typeof searchParams.search === 'string' ? searchParams.search : undefined;
   const category = typeof searchParams.category === 'string' ? searchParams.category : undefined;
@@ -72,14 +77,7 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
   return (
     <section className="py-20 md:py-28">
       <div className="container-wide">
-        <div className="space-y-2 mb-10">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-            Projects
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Explore my development work
-          </p>
-        </div>
+        <ProjectsHeader />
 
         <div className="mb-8">
           <Suspense fallback={null}>

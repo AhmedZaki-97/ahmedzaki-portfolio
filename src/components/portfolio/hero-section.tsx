@@ -1,7 +1,11 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, Github, Linkedin, MessageCircle } from 'lucide-react';
+import { ArrowRight, MessageCircle } from 'lucide-react';
+import { Github, Linkedin } from '@/components/shared/icons';
 import { Button } from '@/components/ui/button';
 import { buildWhatsAppUrl } from '@/lib/utils/whatsapp';
+import { useI18n } from '@/lib/i18n/context';
 import type { ProfileSettings } from '@/types';
 
 interface HeroSectionProps {
@@ -9,6 +13,49 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ profile }: HeroSectionProps) {
+  const { t, locale, isRtl } = useI18n();
+
+  const isDefaultEnglishTitle =
+    !profile?.professional_title ||
+    profile.professional_title === 'Frontend Engineer | React Developer';
+  const isDefaultEnglishHeadline =
+    !profile?.hero_headline ||
+    profile.hero_headline ===
+      'Building Modern, Responsive, and User-Focused Web Experiences.';
+  const isDefaultEnglishDesc =
+    !profile?.hero_description ||
+    profile.hero_description.includes('A passionate Frontend Engineer');
+  const isDefaultEnglishName =
+    !profile?.display_name || profile.display_name === 'Ahmed Zaki';
+
+  const displayName =
+    locale === 'ar'
+      ? isDefaultEnglishName
+        ? t.hero.name
+        : profile?.display_name
+      : profile?.display_name || t.hero.name;
+
+  const professionalTitle =
+    locale === 'ar'
+      ? isDefaultEnglishTitle
+        ? t.hero.defaultTitle
+        : profile?.professional_title
+      : profile?.professional_title || t.hero.defaultTitle;
+
+  const heroHeadline =
+    locale === 'ar'
+      ? isDefaultEnglishHeadline
+        ? t.hero.defaultHeadline
+        : profile?.hero_headline
+      : profile?.hero_headline || t.hero.defaultHeadline;
+
+  const heroDescription =
+    locale === 'ar'
+      ? isDefaultEnglishDesc
+        ? t.hero.defaultDescription
+        : profile?.hero_description
+      : profile?.hero_description || t.hero.defaultDescription;
+
   const whatsappUrl = profile?.whatsapp_number
     ? buildWhatsAppUrl(profile.whatsapp_number, profile.whatsapp_message)
     : null;
@@ -29,42 +76,40 @@ export function HeroSection({ profile }: HeroSectionProps) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
             </span>
-            Available for new opportunities
+            {t.hero.available}
           </div>
 
           {/* Name and role */}
           <div className="space-y-4">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-              {profile?.display_name || 'Ahmed Zaki'}
+              {displayName}
             </h1>
             <p className="text-lg sm:text-xl text-primary font-medium">
-              {profile?.professional_title || 'Frontend Engineer | React Developer'}
+              {professionalTitle}
             </p>
           </div>
 
           {/* Headline */}
           <p className="text-xl sm:text-2xl lg:text-3xl font-semibold leading-relaxed gradient-text">
-            {profile?.hero_headline ||
-              'Building Modern, Responsive, and User-Focused Web Experiences.'}
+            {heroHeadline}
           </p>
 
           {/* Description */}
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {profile?.hero_description ||
-              'A passionate Frontend Engineer specializing in React and modern web technologies. I build responsive, accessible, and performant web applications with clean code and thoughtful user experiences.'}
+            {heroDescription}
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button asChild size="lg" className="gap-2 min-w-[180px]">
               <Link href="/projects">
-                View My Projects
-                <ArrowRight className="h-4 w-4" />
+                {t.hero.viewProjects}
+                <ArrowRight className={`h-4 w-4 ${isRtl ? 'rotate-180' : ''}`} />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="gap-2 min-w-[180px]">
               <Link href="/contact">
-                Contact Me
+                {t.hero.contactMe}
               </Link>
             </Button>
           </div>

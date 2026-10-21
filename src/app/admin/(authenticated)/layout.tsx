@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
 import { AdminMobileNav } from '@/components/admin/admin-mobile-nav';
 
-export default async function AdminDashboardLayout({
+export default async function AdminAuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;

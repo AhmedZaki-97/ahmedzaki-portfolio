@@ -11,12 +11,7 @@ export default async function ContactPage() {
   const profile = await getProfileSettings();
 
   return (
-    <div className="py-10">
-      <div className="container-narrow mb-10">
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-          Contact
-        </h1>
-      </div>
+    <div className="py-12">
       <ContactSection profile={profile} />
     </div>
   );

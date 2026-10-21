@@ -2,13 +2,12 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import {
   Loader2,
   Save,
-  Globe,
   Eye,
   X,
   Plus,
@@ -47,7 +46,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
   const isEditing = !!project;
 
   const form = useForm<ProjectFormValues>({
-    resolver: zodResolver(projectFormSchema),
+    resolver: zodResolver(projectFormSchema) as Resolver<ProjectFormValues>,
     defaultValues: {
       title: project?.title || '',
       slug: project?.slug || '',
@@ -66,13 +65,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
     },
   });
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue, getValues } = form;
+  const { register, handleSubmit, formState: { errors }, setValue, control } = form;
 
-  const title = watch('title');
-  const technologies = watch('technologies');
-  const features = watch('features');
-  const status = watch('status');
-  const isFeatured = watch('is_featured');
+  const technologies = useWatch({ control, name: 'technologies' }) || [];
+  const features = useWatch({ control, name: 'features' }) || [];
+  const status = useWatch({ control, name: 'status' });
+  const isFeatured = useWatch({ control, name: 'is_featured' });
+  const slug = useWatch({ control, name: 'slug' }) || '';
+  const shortDescription = useWatch({ control, name: 'short_description' }) || '';
+  const category = useWatch({ control, name: 'category' }) || '';
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newTitle = e.target.value;
@@ -160,7 +161,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
               {errors.slug && (
                 <p className="text-xs text-destructive">{errors.slug.message}</p>
               )}
-              <p className="text-xs text-muted-foreground">URL: /projects/{watch('slug') || '...'}</p>
+              <p className="text-xs text-muted-foreground">URL: /projects/{slug || '...'}</p>
             </div>
           </div>
 
@@ -179,7 +180,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
               <p className="text-xs text-destructive">{errors.short_description.message}</p>
             )}
             <p className="text-xs text-muted-foreground">
-              {(watch('short_description') || '').length}/300
+              {shortDescription.length}/300
             </p>
           </div>
 
@@ -188,8 +189,8 @@ export function ProjectForm({ project }: ProjectFormProps) {
               Category <span className="text-destructive">*</span>
             </Label>
             <Select
-              value={watch('category')}
-              onValueChange={(value) => setValue('category', value)}
+              value={category}
+              onValueChange={(value) => setValue('category', value || '')}
               disabled={isPending}
             >
               <SelectTrigger>
@@ -255,7 +256,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
           <div className="flex gap-2">
             <Select
               value=""
-              onValueChange={(value) => addTechnology(value)}
+              onValueChange={(value) => { if (value) addTechnology(value); }}
               disabled={isPending}
             >
               <SelectTrigger className="flex-1">
@@ -491,7 +492,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         <div className="flex gap-3">
           {isEditing && project?.status === 'published' && (
             <Button type="button" variant="outline" className="gap-2" asChild>
-              <a href={`/projects/${watch('slug')}`} target="_blank" rel="noopener noreferrer">
+              <a href={`/projects/${slug}`} target="_blank" rel="noopener noreferrer">
                 <Eye className="h-4 w-4" />
                 Preview
               </a>

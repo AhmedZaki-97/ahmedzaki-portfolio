@@ -1,8 +1,4 @@
-// This file will be auto-generated from the Supabase schema.
-// For now, we define the types manually to match our migration.
-// Run `npx supabase gen types typescript --local > src/types/database.types.ts`
-// to regenerate after applying migrations.
-
+// Auto-generated matching Supabase migration schema
 export type Json =
   | string
   | number
@@ -46,7 +42,7 @@ export interface Database {
           thumbnail_path?: string | null;
           gallery_paths?: string[];
           technologies?: string[];
-          category: string;
+          category?: string;
           live_url?: string | null;
           github_url?: string | null;
           status?: 'draft' | 'published';
@@ -81,6 +77,7 @@ export interface Database {
           updated_at?: string;
           published_at?: string | null;
         };
+        Relationships: [];
       };
       profile_settings: {
         Row: {
@@ -109,10 +106,10 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          display_name: string;
-          professional_title: string;
-          hero_headline: string;
-          hero_description: string;
+          display_name?: string;
+          professional_title?: string;
+          hero_headline?: string;
+          hero_description?: string;
           about_bio?: string | null;
           profile_image_path?: string | null;
           resume_url?: string | null;
@@ -155,6 +152,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       skills: {
         Row: {
@@ -190,7 +188,12 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }

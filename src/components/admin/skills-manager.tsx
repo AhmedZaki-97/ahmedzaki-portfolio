@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import {
@@ -40,11 +40,21 @@ import {
 } from '@/components/ui/alert-dialog';
 import { skillFormSchema, type SkillFormValues } from '@/features/skills/schemas';
 import { createSkill, updateSkill, deleteSkill, toggleSkillVisibility } from '@/features/skills/actions';
+import { useI18n } from '@/lib/i18n/context';
 import type { Skill } from '@/types';
 
 interface SkillsManagerProps {
   skills: Skill[];
 }
+
+const categoryTranslations: Record<string, string> = {
+  'Frontend Fundamentals': 'أساسيات الواجهة الأمامية',
+  'Frameworks & Libraries': 'أطر العمل والمكتبات',
+  'Styling & UI': 'التصميم وواجهات المستخدم',
+  'Tools & Workflow': 'الأدوات وبيئة العمل',
+  'Backend & APIs': 'الخلفية وواجهات البرمجة',
+  'Other': 'أخرى',
+};
 
 export function SkillsManager({ skills }: SkillsManagerProps) {
   const router = useRouter();
@@ -53,9 +63,10 @@ export function SkillsManager({ skills }: SkillsManagerProps) {
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState('');
+  const { t, locale, isRtl } = useI18n();
 
   const form = useForm<SkillFormValues>({
-    resolver: zodResolver(skillFormSchema),
+    resolver: zodResolver(skillFormSchema) as Resolver<SkillFormValues>,
     defaultValues: {
       name: '',
       category: '',
@@ -66,7 +77,8 @@ export function SkillsManager({ skills }: SkillsManagerProps) {
     },
   });
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = form;
+  const { register, handleSubmit, formState: { errors }, reset, setValue, control } = form;
+  const isSkillVisible = useWatch({ control, name: 'is_visible' });
 
   // Group skills by category
   const grouped = skills.reduce<Record<string, Skill[]>>((acc, skill) => {
@@ -149,18 +161,18 @@ export function SkillsManager({ skills }: SkillsManagerProps) {
       <div className="flex justify-end">
         <Button onClick={openCreateDialog} className="gap-2">
           <Plus className="h-4 w-4" />
-          Add Skill
+          {t.admin.addSkill}
         </Button>
       </div>
 
       {skills.length === 0 ? (
         <div className="text-center py-16 border border-dashed border-border rounded-lg">
           <Wrench className="mx-auto h-12 w-12 text-muted-foreground/40" />
-          <h3 className="mt-4 text-lg font-semibold">No skills yet</h3>
-          <p className="text-muted-foreground mt-1">Add your first skill to get started.</p>
+          <h3 className="mt-4 text-lg font-semibold">{isRtl ? 'لا توجد مهارات حتى الآن' : 'No skills yet'}</h3>
+          <p className="text-muted-foreground mt-1">{isRtl ? 'أضف أول مهارة للبدء.' : 'Add your first skill to get started.'}</p>
           <Button onClick={openCreateDialog} className="mt-4 gap-2">
             <Plus className="h-4 w-4" />
-            Add Skill
+            {t.admin.addSkill}
           </Button>
         </div>
       ) : (
@@ -171,7 +183,7 @@ export function SkillsManager({ skills }: SkillsManagerProps) {
               <Card key={category}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-semibold text-primary uppercase tracking-wider">
-                    {category}
+                    {locale === 'ar' ? categoryTranslations[category] || category : category}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -310,7 +322,7 @@ export function SkillsManager({ skills }: SkillsManagerProps) {
               <Label htmlFor="skill-visible">Visible on portfolio</Label>
               <Switch
                 id="skill-visible"
-                checked={form.watch('is_visible')}
+                checked={isSkillVisible}
                 onCheckedChange={(checked) => setValue('is_visible', checked)}
                 disabled={isPending}
               />

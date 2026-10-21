@@ -18,20 +18,23 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { LanguageToggle } from '@/components/shared/language-toggle';
 import { logoutAction } from '@/features/authentication/actions';
-
-const sidebarLinks = [
-  { label: 'Overview', href: '/admin/dashboard', icon: LayoutDashboard },
-  { label: 'Projects', href: '/admin/projects', icon: FolderKanban },
-  { label: 'Add Project', href: '/admin/projects/new', icon: PlusCircle },
-  { label: 'Skills', href: '/admin/skills', icon: Wrench },
-  { label: 'Settings', href: '/admin/settings', icon: Settings },
-];
+import { useI18n } from '@/lib/i18n/context';
 
 export function AdminMobileNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const { t, isRtl } = useI18n();
+
+  const sidebarLinks = [
+    { label: t.admin.dashboard, href: '/admin/dashboard', icon: LayoutDashboard },
+    { label: t.admin.projects, href: '/admin/projects', icon: FolderKanban },
+    { label: t.admin.newProject, href: '/admin/projects/new', icon: PlusCircle },
+    { label: t.admin.skills, href: '/admin/skills', icon: Wrench },
+    { label: t.admin.settings, href: '/admin/settings', icon: Settings },
+  ];
 
   return (
     <div className="lg:hidden flex items-center justify-between h-14 px-4 border-b border-border bg-card/50 sticky top-0 z-40">
@@ -39,7 +42,8 @@ export function AdminMobileNav() {
         Admin<span className="text-primary">Panel</span>
       </Link>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
+        <LanguageToggle showLabel={false} />
         <ThemeToggle />
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
@@ -47,7 +51,7 @@ export function AdminMobileNav() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0">
+          <SheetContent side={isRtl ? 'right' : 'left'} className="w-64 p-0">
             <SheetTitle className="px-4 pt-4 text-lg font-bold">
               Admin<span className="text-primary">Panel</span>
             </SheetTitle>
@@ -83,7 +87,7 @@ export function AdminMobileNav() {
                 className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
-                View Website
+                {t.admin.backToSite}
               </a>
               <form
                 action={() => {
@@ -96,8 +100,8 @@ export function AdminMobileNav() {
                   className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
                   disabled={isPending}
                 >
-                  <LogOut className="h-4 w-4" />
-                  {isPending ? 'Signing out...' : 'Sign Out'}
+                  <LogOut className={`h-4 w-4 ${isRtl ? 'rotate-180' : ''}`} />
+                  {isPending ? t.admin.loggingOut : t.admin.logout}
                 </Button>
               </form>
             </nav>

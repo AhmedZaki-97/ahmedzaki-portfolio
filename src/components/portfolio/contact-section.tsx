@@ -1,6 +1,10 @@
-import { Mail, Github, Linkedin, MessageCircle } from 'lucide-react';
+'use client';
+
+import { Mail, MessageCircle } from 'lucide-react';
+import { Github, Linkedin } from '@/components/shared/icons';
 import { Button } from '@/components/ui/button';
 import { buildWhatsAppUrl } from '@/lib/utils/whatsapp';
+import { useI18n } from '@/lib/i18n/context';
 import type { ProfileSettings } from '@/types';
 
 interface ContactSectionProps {
@@ -8,6 +12,8 @@ interface ContactSectionProps {
 }
 
 export function ContactSection({ profile }: ContactSectionProps) {
+  const { t } = useI18n();
+
   const whatsappUrl = profile?.whatsapp_number
     ? buildWhatsAppUrl(profile.whatsapp_number, profile.whatsapp_message)
     : null;
@@ -17,11 +23,10 @@ export function ContactSection({ profile }: ContactSectionProps) {
       <div className="container-narrow text-center">
         <div className="space-y-6">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Get In Touch
+            {t.contact.title}
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            {profile?.contact_section_content ||
-              'I am always interested in connecting with fellow developers and discussing new opportunities. Feel free to reach out!'}
+            {profile?.contact_section_content || t.contact.subtitle}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -33,7 +38,7 @@ export function ContactSection({ profile }: ContactSectionProps) {
                   rel="noopener noreferrer"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  WhatsApp Me
+                  {t.hero.chatWhatsApp}
                 </a>
               </Button>
             )}
@@ -41,7 +46,7 @@ export function ContactSection({ profile }: ContactSectionProps) {
               <Button asChild variant="outline" size="lg" className="gap-2 min-w-[200px]">
                 <a href={`mailto:${profile.email}`}>
                   <Mail className="h-4 w-4" />
-                  Send Email
+                  {profile.email}
                 </a>
               </Button>
             )}

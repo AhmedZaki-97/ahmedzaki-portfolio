@@ -4,6 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth/admin';
 import { projectFormSchema } from '@/features/projects/schemas';
 import { checkSlugExists } from '@/features/projects/services';
+import type { Database } from '@/types/database.types';
+
+type ProjectUpdate = Database['public']['Tables']['projects']['Update'];
 
 export type ActionResult = {
   success: boolean;
@@ -100,7 +103,7 @@ export async function updateProject(id: string, formData: unknown): Promise<Acti
 
     const { error } = await supabase
       .from('projects')
-      .update(cleanData)
+      .update(cleanData as ProjectUpdate)
       .eq('id', id);
 
     if (error) {
@@ -214,7 +217,7 @@ export async function toggleProjectStatus(id: string): Promise<ActionResult> {
 
     const { error } = await supabase
       .from('projects')
-      .update(updateData)
+      .update(updateData as ProjectUpdate)
       .eq('id', id);
 
     if (error) {

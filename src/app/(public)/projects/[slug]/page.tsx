@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink, Github, Calendar } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Calendar } from 'lucide-react';
+import { Github } from '@/components/shared/icons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,8 +11,12 @@ import { Separator } from '@/components/ui/separator';
 import { ProjectCard } from '@/components/portfolio/project-card';
 import { getProjectBySlug, getRelatedProjects } from '@/features/projects/services';
 
+interface ProjectPageProps {
+  params: Promise<{ slug: string }>;
+}
+
 export async function generateMetadata(
-  props: PageProps<"/projects/[slug]">
+  props: ProjectPageProps
 ): Promise<Metadata> {
   const params = await props.params;
   const project = await getProjectBySlug(params.slug);
@@ -30,7 +35,7 @@ export async function generateMetadata(
 }
 
 export default async function ProjectDetailPage(
-  props: PageProps<"/projects/[slug]">
+  props: ProjectPageProps
 ) {
   const params = await props.params;
   const project = await getProjectBySlug(params.slug);

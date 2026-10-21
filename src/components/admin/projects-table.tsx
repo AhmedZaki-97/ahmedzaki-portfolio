@@ -46,6 +46,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { deleteProject, toggleProjectStatus, toggleProjectFeatured } from '@/features/projects/actions';
+import { useI18n } from '@/lib/i18n/context';
 import type { Project } from '@/types';
 
 interface AdminProjectsTableProps {
@@ -58,6 +59,7 @@ export function AdminProjectsTable({ projects }: AdminProjectsTableProps) {
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteTitle, setDeleteTitle] = useState('');
+  const { t, isRtl } = useI18n();
 
   const filteredProjects = projects.filter(
     (p) =>
@@ -123,10 +125,10 @@ export function AdminProjectsTable({ projects }: AdminProjectsTableProps) {
     <>
       {/* Search */}
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className={`absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
         <Input
-          placeholder="Search projects..."
-          className="pl-10"
+          placeholder={isRtl ? 'ابحث في المشاريع...' : 'Search projects...'}
+          className={isRtl ? 'pr-10 pl-3' : 'pl-10 pr-3'}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -137,13 +139,13 @@ export function AdminProjectsTable({ projects }: AdminProjectsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[60px]">Image</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead className="hidden md:table-cell">Category</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden sm:table-cell">Featured</TableHead>
-              <TableHead className="hidden lg:table-cell">Updated</TableHead>
-              <TableHead className="w-[60px]">Actions</TableHead>
+              <TableHead className="w-[60px]">{isRtl ? 'الصورة' : 'Image'}</TableHead>
+              <TableHead>{isRtl ? 'العنوان' : 'Title'}</TableHead>
+              <TableHead className="hidden md:table-cell">{isRtl ? 'التصنيف' : 'Category'}</TableHead>
+              <TableHead>{isRtl ? 'الحالة' : 'Status'}</TableHead>
+              <TableHead className="hidden sm:table-cell">{isRtl ? 'مميز' : 'Featured'}</TableHead>
+              <TableHead className="hidden lg:table-cell">{isRtl ? 'تاريخ التحديث' : 'Updated'}</TableHead>
+              <TableHead className="w-[60px]">{isRtl ? 'الإجراءات' : 'Actions'}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

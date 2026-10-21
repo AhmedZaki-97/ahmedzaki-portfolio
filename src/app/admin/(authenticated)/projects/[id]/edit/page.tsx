@@ -8,8 +8,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+interface EditProjectPageProps {
+  params: Promise<{ id: string }>;
+}
+
 export default async function EditProjectPage(
-  props: PageProps<"/admin/projects/[id]/edit">
+  props: EditProjectPageProps
 ) {
   const params = await props.params;
   const project = await getProjectById(params.id);

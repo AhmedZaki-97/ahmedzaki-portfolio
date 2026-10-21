@@ -13,7 +13,24 @@ export async function loginAction(formData: { email: string; password: string })
   });
 
   if (error) {
-    return { success: false, error: 'Invalid email or password. Please try again.' };
+    return { success: false, error: error.message || 'Invalid email or password. Please try again.' };
+  }
+
+  // Check admin allowlist
+  const adminEmails = (process.env.ADMIN_EMAIL_ALLOWLIST || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (
+    adminEmails.length > 0 &&
+    !adminEmails.includes(formData.email.trim().toLowerCase())
+  ) {
+    await supabase.auth.signOut();
+    return {
+      success: false,
+      error: `تم تسجيل الدخول لكن البريد (${formData.email}) غير مضاف في قائمة المشرفين ADMIN_EMAIL_ALLOWLIST داخل ملف .env.local`,
+    };
   }
 
   revalidatePath('/admin', 'layout');
