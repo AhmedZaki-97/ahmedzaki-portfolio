@@ -1,11 +1,14 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { Github, Linkedin } from '@/components/shared/icons';
 import { Button } from '@/components/ui/button';
 import { buildWhatsAppUrl } from '@/lib/utils/whatsapp';
 import { useI18n } from '@/lib/i18n/context';
+import GridScan from '@/components/GridScan';
 import type { ProfileSettings } from '@/types';
 
 interface HeroSectionProps {
@@ -14,6 +17,14 @@ interface HeroSectionProps {
 
 export function HeroSection({ profile }: HeroSectionProps) {
   const { t, locale, isRtl } = useI18n();
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLight = mounted && resolvedTheme === 'light';
 
   const isDefaultEnglishTitle =
     !profile?.professional_title ||
@@ -61,14 +72,46 @@ export function HeroSection({ profile }: HeroSectionProps) {
     : null;
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-chart-2/5 rounded-full blur-3xl" />
+    <section className="relative overflow-hidden min-h-[580px]">
+      {/* GridScan 3D Interactive Background */}
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        <GridScan
+          linesColor={isLight ? '#d4d4d8' : '#4d4757'}
+          scanColor={isLight ? '#0284c7' : '#7dd3fc'}
+          cells={8}
+          depth={3}
+          scanDuration={2.4}
+          scanDelay={1.6}
+          clickEffect="ping"
+          lineThickness={1}
+          lineStyle="solid"
+          depthFade={0.6}
+          shading={0.7}
+          reflection={0.35}
+          points
+          scanDirection="forward"
+          scanWidth={1}
+          trail={0.5}
+          glow={0.6}
+          parallax={1}
+          autoScan
+          interactive
+          enableWebcam={false}
+          showPreview
+          intro
+          lightMode={isLight}
+        />
+        {/* Soft gradient masks to blend cleanly with portfolio theme */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background via-background/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background/40 to-transparent pointer-events-none" />
       </div>
 
-      <div className="container-wide py-24 md:py-32 lg:py-40">
+      {/* Subtle radial glow decoration */}
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container-wide py-24 md:py-32 lg:py-40 relative z-10">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           {/* Status badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 px-4 py-1.5 text-sm text-muted-foreground backdrop-blur-sm">
