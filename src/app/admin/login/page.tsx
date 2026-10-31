@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { LoginForm } from '@/features/authentication/components/login-form';
 import { LanguageToggle } from '@/components/shared/language-toggle';
@@ -26,8 +27,11 @@ export default function AdminLoginPage() {
             Sign in to manage your portfolio
           </p>
         </div>
-        <LoginForm />
+        <Suspense fallback={<div className="h-48 rounded-lg bg-card animate-pulse" />}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );
 }
+

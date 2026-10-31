@@ -6,6 +6,8 @@ import { X, Loader2, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { getSanitizedSupabaseUrl } from '@/lib/supabase/config';
+
 
 interface ImageUploadProps {
   value?: string | null;
@@ -124,8 +126,9 @@ export function ImageUpload({
   const imageUrl = value
     ? value.startsWith('http')
       ? value
-      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${value}`
+      : `${getSanitizedSupabaseUrl()}/storage/v1/object/public/${value.replace(/^\/+/, '')}`
     : null;
+
 
   return (
     <div className={cn('space-y-2', className)}>

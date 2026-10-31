@@ -1,19 +1,19 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { getSanitizedSupabaseUrl, getSanitizedSupabaseKey } from './config';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const supabaseUrl = getSanitizedSupabaseUrl();
+  const supabaseAnonKey = getSanitizedSupabaseKey();
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return supabaseResponse;
   }
+
 
   const supabase = createServerClient(
     supabaseUrl,
@@ -47,12 +47,14 @@ export async function updateSession(request: NextRequest) {
   if (
     !user &&
     request.nextUrl.pathname.startsWith('/admin') &&
-    !request.nextUrl.pathname.startsWith('/admin/login')
+    !request.nextUrl.pathname.startsWith('/admin/login') &&
+    !request.nextUrl.pathname.startsWith('/admin/reset-password')
   ) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin/login';
     return NextResponse.redirect(url);
   }
+
 
   // Redirect authenticated users away from login page
   if (user && request.nextUrl.pathname === '/admin/login') {
